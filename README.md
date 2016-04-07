@@ -1,4 +1,4 @@
 # TestExoPlayer
 Test exoplayer for jiecaovideoplayer
 
-* [DownloadAPK](/downloads/app-debug.apk)
+* [DownloadAPK](https://github.com/lipangit/TestExoPlayer/blob/master/downloads/app-debug.apk?raw=true)
