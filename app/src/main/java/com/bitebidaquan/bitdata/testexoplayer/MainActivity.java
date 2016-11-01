@@ -1,6 +1,7 @@
 package com.bitebidaquan.bitdata.testexoplayer;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Build;
@@ -27,20 +28,21 @@ import com.google.android.exoplayer.util.Util;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements DemoPlayer.Listener, DemoPlayer.CaptionListener, DemoPlayer.Id3MetadataListener, TextureView.SurfaceTextureListener {
-    private TextureView surfaceView, surfaceView1;
+    private TextureView textureView, surfaceView1;
     private DemoPlayer player;
     Uri contentUri = Uri.parse("http://2449.vod.myqcloud.com/2449_43b6f696980311e59ed467f22794e792.f20.mp4");
     public static SurfaceTexture mSavedSurfaceTexture;
-    final String LOG_TAG = MainActivity.class.getSimpleName();
+    final String LOG_TAG = "TestChangeSurface";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("aaaaa");
         setContentView(R.layout.activity_main);
-        surfaceView = (TextureView) findViewById(R.id.surface_view);
+        textureView = (TextureView) findViewById(R.id.surface_view);
         surfaceView1 = (TextureView) findViewById(R.id.surface_view1);
 
-        surfaceView.setSurfaceTextureListener(this);
+        textureView.setSurfaceTextureListener(this);
 
         player = new DemoPlayer(getRendererBuilder());
         player.addListener(this);
@@ -48,24 +50,25 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         player.setMetadataListener(this);
         player.prepare();
         player.setPlayWhenReady(true);
-        surfaceView.setOnClickListener(new View.OnClickListener() {
+        textureView.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
-                if (mSavedSurfaceTexture == null) {
-                    mSavedSurfaceTexture = surfaceView.getSurfaceTexture();
-                }
-//                surfaceView.setSurfaceTexture(mSavedSurfaceTexture);
-                player.setSurface(new Surface(mSavedSurfaceTexture));
+                startActivity(new Intent(MainActivity.this, SecActivity.class));
+//                if (mSavedSurfaceTexture == null) {
+//                    mSavedSurfaceTexture = textureView.getSurfaceTexture();
+//                }
+////                textureView.setSurfaceTexture(mSavedSurfaceTexture);
+//                player.setSurface(new Surface(mSavedSurfaceTexture));
 
-//                player.setSurface(surfaceView.getHolder().getSurface());
+//                player.setSurface(textureView.getHolder().getSurface());
             }
         });
         surfaceView1.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
-                ((ViewGroup) surfaceView.getParent()).removeView(surfaceView);
+                ((ViewGroup) textureView.getParent()).removeView(textureView);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -140,8 +143,13 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.d(LOG_TAG, "onSurfaceTextureAvailable size=" + width + "x" + height + ", st=" + surface);
-        mSavedSurfaceTexture = surface;
+        Log.d(LOG_TAG, "onSurfaceTextureAvailable 1");
+        if (mSavedSurfaceTexture == null) {
+            mSavedSurfaceTexture = textureView.getSurfaceTexture();
+        } else {
+
+        }
+        player.setSurface(new Surface(mSavedSurfaceTexture));
     }
 
     @Override
@@ -149,11 +157,26 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
 
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.d(LOG_TAG, "onSurfaceTextureDestroyed ");
-        return false;
+        Log.d(LOG_TAG, "onSurfaceTextureDestroyed 1");
+        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
+
+//        if (mSavedSurfaceTexture != null) {
+//            if (SecActivity.tv.isAvailable()) {
+//                if (!haveSetTexture) {
+//                    SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
+//                    haveSetTexture = true;
+//                }
+//            }
+//        } else {
+//            mSavedSurfaceTexture = surface;
+//        }
+        return (mSavedSurfaceTexture == null);
     }
+
+    public static boolean haveSetTexture = false;
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
