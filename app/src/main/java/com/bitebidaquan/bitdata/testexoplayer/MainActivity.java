@@ -1,7 +1,6 @@
 package com.bitebidaquan.bitdata.testexoplayer;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Build;
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SecActivity.class));
+//                startActivity(new Intent(MainActivity.this, SecActivity.class));
 //                if (mSavedSurfaceTexture == null) {
 //                    mSavedSurfaceTexture = textureView.getSurfaceTexture();
 //                }
@@ -62,31 +61,39 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
 //                player.setSurface(new Surface(mSavedSurfaceTexture));
 
 //                player.setSurface(textureView.getHolder().getSurface());
+
+
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Thread.sleep(1000);
+//                    }
+//                }).start();
             }
         });
         surfaceView1.setOnClickListener(new View.OnClickListener() {
-            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
-                ((ViewGroup) textureView.getParent()).removeView(textureView);
+                ViewGroup vg = (ViewGroup) findViewById(R.id.root);
+                vg.removeView(textureView);
+                System.out.println("fdsfds remove view");
+//                textureView.setVisibility(View.GONE);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             Thread.sleep(1000);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    surfaceView1.setSurfaceTexture(mSavedSurfaceTexture);
-                                }
-                            });
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                surfaceView1.setSurfaceTexture(mSavedSurfaceTexture);
+                            }
+                        });
                     }
                 }).start();
-//                player.setSurface(new Surface(mSavedSurfaceTexture));
-//                player.setSurface(surfaceView1.getHolder().getSurface());
             }
         });
     }
@@ -146,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         Log.d(LOG_TAG, "onSurfaceTextureAvailable 1");
         if (mSavedSurfaceTexture == null) {
             mSavedSurfaceTexture = textureView.getSurfaceTexture();
+            player.setSurface(new Surface(mSavedSurfaceTexture));
         } else {
-
+            textureView.setSurfaceTexture(mSavedSurfaceTexture);
         }
-        player.setSurface(new Surface(mSavedSurfaceTexture));
     }
 
     @Override
@@ -161,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         Log.d(LOG_TAG, "onSurfaceTextureDestroyed 1");
-        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
+//        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
 
 //        if (mSavedSurfaceTexture != null) {
 //            if (SecActivity.tv.isAvailable()) {

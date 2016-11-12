@@ -1,12 +1,15 @@
 package com.bitebidaquan.bitdata.testexoplayer;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.TextureView;
+import android.view.View;
 
 /**
  * Created by Nathen on 2016/11/1.
@@ -24,6 +27,14 @@ public class SecActivity extends AppCompatActivity implements TextureView.Surfac
         tv.setSurfaceTextureListener(this);
     }
 
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+
+
+
+        return super.onCreateView(parent, name, context, attrs);
+    }
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -31,6 +42,7 @@ public class SecActivity extends AppCompatActivity implements TextureView.Surfac
 //            tv.setSurfaceTexture(MainActivity.mSavedSurfaceTexture);
 //            MainActivity.haveSetTexture = true;
 //        }
+
         Log.d(LOG_TAG, "onSurfaceTextureAvailable 2");
     }
 
