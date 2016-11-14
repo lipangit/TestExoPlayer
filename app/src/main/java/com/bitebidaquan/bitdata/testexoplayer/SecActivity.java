@@ -1,64 +1,36 @@
 package com.bitebidaquan.bitdata.testexoplayer;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.graphics.SurfaceTexture;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * Created by Nathen on 2016/11/1.
  */
 
-public class SecActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
-    public static TextureView tv;
+public class SecActivity extends AppCompatActivity {
     final String LOG_TAG = "TestChangeSurface";
+    ViewGroup vg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("bbbbb");
         setContentView(R.layout.activity_sec);
-        tv = (TextureView) findViewById(R.id.sec_tv);
-        tv.setSurfaceTextureListener(this);
+        vg = (ViewGroup) findViewById(R.id.root);
+        vg.addView(MainActivity.textureView);
+        vg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.textureView.setSurfaceTexture(MainActivity.mSavedSurfaceTexture);
+            }
+        });
     }
 
     @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-
-
-
-        return super.onCreateView(parent, name, context, attrs);
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-//        if (!MainActivity.haveSetTexture) {
-//            tv.setSurfaceTexture(MainActivity.mSavedSurfaceTexture);
-//            MainActivity.haveSetTexture = true;
-//        }
-
-        Log.d(LOG_TAG, "onSurfaceTextureAvailable 2");
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.d(LOG_TAG, "onSurfaceTextureDestroyed 2");
-        return false;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
+    protected void onPause() {
+        super.onPause();
+        vg.removeView(MainActivity.textureView);
     }
 }

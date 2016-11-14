@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.bitebidaquan.bitdata.testexoplayer.player.DashRendererBuilder;
 import com.bitebidaquan.bitdata.testexoplayer.player.DemoPlayer;
@@ -26,7 +26,8 @@ import com.google.android.exoplayer.util.Util;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements DemoPlayer.Listener, DemoPlayer.CaptionListener, DemoPlayer.Id3MetadataListener, TextureView.SurfaceTextureListener {
-    private TextureView textureView1, textureView2;
+    public static TextureView textureView;
+    LinearLayout root;
     private DemoPlayer player;
     Uri contentUri = Uri.parse("http://2449.vod.myqcloud.com/2449_43b6f696980311e59ed467f22794e792.f20.mp4");
     public static SurfaceTexture mSavedSurfaceTexture;
@@ -37,10 +38,9 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         super.onCreate(savedInstanceState);
         setTitle("aaaaa");
         setContentView(R.layout.activity_main);
-        textureView1 = (TextureView) findViewById(R.id.surface_view1);
-        textureView2 = (TextureView) findViewById(R.id.surface_view2);
-
-        textureView1.setSurfaceTextureListener(this);
+        root = (LinearLayout) findViewById(R.id.root);
+        textureView = new TextureView(this);
+        textureView.setSurfaceTextureListener(this);
 
         player = new DemoPlayer(getRendererBuilder());
         player.addListener(this);
@@ -48,38 +48,20 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         player.setMetadataListener(this);
         player.prepare();
         player.setPlayWhenReady(true);
-        textureView1.setOnClickListener(new View.OnClickListener() {
+        textureView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                root.removeView(textureView);
                 startActivity(new Intent(MainActivity.this, SecActivity.class));
-            }
-        });
-        textureView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ViewGroup vg = (ViewGroup) findViewById(R.id.root);
-                vg.removeView(textureView1);
-                System.out.println("fdsfds remove view");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1);// maybe the timer is point
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textureView2.setSurfaceTexture(mSavedSurfaceTexture);// complete second target, this is not stable!
-                            }
-                        });
-                    }
-                }).start();
             }
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        root.addView(textureView);
+    }
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -88,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
             mSavedSurfaceTexture = surface;
             player.setSurface(new Surface(mSavedSurfaceTexture));
         } else {
-            textureView1.setSurfaceTexture(mSavedSurfaceTexture);// complete first target, this is stable
+            textureView.setSurfaceTexture(mSavedSurfaceTexture);
         }
     }
 
@@ -100,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         Log.d(LOG_TAG, "onSurfaceTextureDestroyed 1");
-        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
+//        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
         return (mSavedSurfaceTexture == null);
     }
 
