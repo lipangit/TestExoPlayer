@@ -1,9 +1,8 @@
 package com.bitebidaquan.bitdata.testexoplayer;
 
-import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -27,7 +26,7 @@ import com.google.android.exoplayer.util.Util;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements DemoPlayer.Listener, DemoPlayer.CaptionListener, DemoPlayer.Id3MetadataListener, TextureView.SurfaceTextureListener {
-    private TextureView textureView, surfaceView1;
+    private TextureView textureView1, textureView2;
     private DemoPlayer player;
     Uri contentUri = Uri.parse("http://2449.vod.myqcloud.com/2449_43b6f696980311e59ed467f22794e792.f20.mp4");
     public static SurfaceTexture mSavedSurfaceTexture;
@@ -38,10 +37,10 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         super.onCreate(savedInstanceState);
         setTitle("aaaaa");
         setContentView(R.layout.activity_main);
-        textureView = (TextureView) findViewById(R.id.surface_view);
-        surfaceView1 = (TextureView) findViewById(R.id.surface_view1);
+        textureView1 = (TextureView) findViewById(R.id.surface_view1);
+        textureView2 = (TextureView) findViewById(R.id.surface_view2);
 
-        textureView.setSurfaceTextureListener(this);
+        textureView1.setSurfaceTextureListener(this);
 
         player = new DemoPlayer(getRendererBuilder());
         player.addListener(this);
@@ -49,47 +48,30 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         player.setMetadataListener(this);
         player.prepare();
         player.setPlayWhenReady(true);
-        textureView.setOnClickListener(new View.OnClickListener() {
-            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+        textureView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                startActivity(new Intent(MainActivity.this, SecActivity.class));
-//                if (mSavedSurfaceTexture == null) {
-//                    mSavedSurfaceTexture = textureView.getSurfaceTexture();
-//                }
-////                textureView.setSurfaceTexture(mSavedSurfaceTexture);
-//                player.setSurface(new Surface(mSavedSurfaceTexture));
-
-//                player.setSurface(textureView.getHolder().getSurface());
-
-
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Thread.sleep(1000);
-//                    }
-//                }).start();
+                startActivity(new Intent(MainActivity.this, SecActivity.class));
             }
         });
-        surfaceView1.setOnClickListener(new View.OnClickListener() {
+        textureView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ViewGroup vg = (ViewGroup) findViewById(R.id.root);
-                vg.removeView(textureView);
+                vg.removeView(textureView1);
                 System.out.println("fdsfds remove view");
-//                textureView.setVisibility(View.GONE);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-//                        try {
-//                            Thread.sleep(1);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
+                        try {
+                            Thread.sleep(1);// maybe the timer is point
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                surfaceView1.setSurfaceTexture(mSavedSurfaceTexture);
+                                textureView2.setSurfaceTexture(mSavedSurfaceTexture);// complete second target, this is not stable!
                             }
                         });
                     }
@@ -97,6 +79,42 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
             }
         });
     }
+
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.d(LOG_TAG, "onSurfaceTextureAvailable 1");
+        if (mSavedSurfaceTexture == null) {
+            mSavedSurfaceTexture = surface;
+            player.setSurface(new Surface(mSavedSurfaceTexture));
+        } else {
+            textureView1.setSurfaceTexture(mSavedSurfaceTexture);// complete first target, this is stable
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        Log.d(LOG_TAG, "onSurfaceTextureDestroyed 1");
+        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
+        return (mSavedSurfaceTexture == null);
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy ");
+    }
+
 
     private static int inferContentType(Uri uri, String fileExtension) {
         String lastPathSegment = !TextUtils.isEmpty(fileExtension) ? "." + fileExtension
@@ -146,53 +164,5 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
     @Override
     public void onId3Metadata(List<Id3Frame> id3Frames) {
 
-    }
-
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.d(LOG_TAG, "onSurfaceTextureAvailable 1");
-        if (mSavedSurfaceTexture == null) {
-            mSavedSurfaceTexture = textureView.getSurfaceTexture();
-            player.setSurface(new Surface(mSavedSurfaceTexture));
-        } else {
-            textureView.setSurfaceTexture(mSavedSurfaceTexture);
-        }
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.d(LOG_TAG, "onSurfaceTextureDestroyed 1");
-//        SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
-
-//        if (mSavedSurfaceTexture != null) {
-//            if (SecActivity.tv.isAvailable()) {
-//                if (!haveSetTexture) {
-//                    SecActivity.tv.setSurfaceTexture(mSavedSurfaceTexture);
-//                    haveSetTexture = true;
-//                }
-//            }
-//        } else {
-//            mSavedSurfaceTexture = surface;
-//        }
-        return (mSavedSurfaceTexture == null);
-    }
-
-    public static boolean haveSetTexture = false;
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy ");
     }
 }
