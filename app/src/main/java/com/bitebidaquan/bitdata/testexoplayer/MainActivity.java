@@ -70,7 +70,22 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
             mSavedSurfaceTexture = surface;
             player.setSurface(new Surface(mSavedSurfaceTexture));
         } else {
-            textureView.setSurfaceTexture(mSavedSurfaceTexture);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+//                    try {
+//                        Thread.sleep(0);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            textureView.setSurfaceTexture(mSavedSurfaceTexture);
+                        }
+                    });
+                }
+            }).start();
         }
     }
 
