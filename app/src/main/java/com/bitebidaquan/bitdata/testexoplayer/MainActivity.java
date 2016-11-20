@@ -25,7 +25,7 @@ import com.google.android.exoplayer.util.Util;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements DemoPlayer.Listener, DemoPlayer.CaptionListener, DemoPlayer.Id3MetadataListener, TextureView.SurfaceTextureListener {
+public class MainActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
     public static TextureView textureView;
     LinearLayout root;
     private DemoPlayer player;
@@ -43,9 +43,6 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         textureView.setSurfaceTextureListener(this);
 
         player = new DemoPlayer(getRendererBuilder());
-        player.addListener(this);
-        player.setCaptionListener(this);
-        player.setMetadataListener(this);
         player.prepare();
         player.setPlayWhenReady(true);
         textureView.setOnClickListener(new View.OnClickListener() {
@@ -138,28 +135,5 @@ public class MainActivity extends AppCompatActivity implements DemoPlayer.Listen
         }
     }
 
-    @Override
-    public void onStateChanged(boolean playWhenReady, int playbackState) {
 
-    }
-
-    @Override
-    public void onError(Exception e) {
-
-    }
-
-    @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-
-    }
-
-    @Override
-    public void onCues(List<Cue> cues) {
-
-    }
-
-    @Override
-    public void onId3Metadata(List<Id3Frame> id3Frames) {
-
-    }
 }
